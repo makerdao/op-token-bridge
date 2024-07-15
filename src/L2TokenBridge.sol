@@ -151,7 +151,7 @@ contract L2TokenBridge {
         bytes calldata _extraData
     ) public {
         require(isOpen == 1, "L2TokenBridge/closed"); // do not allow initiating new xchain messages if bridge is closed
-        require(l1ToL2Token[_remoteToken] == _localToken, "L2TokenBridge/invalid-token");
+        require(_remoteToken != address(0) && l1ToL2Token[_remoteToken] == _localToken, "L2TokenBridge/invalid-token");
 
         TokenLike(_localToken).burn(msg.sender, _amount); // TODO: should l2Tokens allow authed burn?
 

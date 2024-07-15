@@ -153,7 +153,7 @@ contract L1TokenBridge {
         bytes calldata _extraData
     ) public {
         require(isOpen == 1, "L1TokenBridge/closed"); // do not allow initiating new xchain messages if bridge is closed
-        require(l1ToL2Token[_localToken] == _remoteToken, "L1TokenBridge/invalid-token");
+        require(_remoteToken != address(0) && l1ToL2Token[_localToken] == _remoteToken, "L1TokenBridge/invalid-token");
 
         TokenLike(_localToken).transferFrom(msg.sender, escrow, _amount);
 
