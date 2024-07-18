@@ -1,0 +1,13 @@
+{
+  "domains": {
+    "mainnet": {
+      "chainlog": "0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F",
+      "tokens": []
+    },
+    "base": {
+      "l1Messenger": "0x866E82a600A1414e583f7F13623F1aC5d58b0Afa",
+      "l2Messenger": "0x4200000000000000000000000000000000000007",
+      "tokens": []
+    }
+  }
+}

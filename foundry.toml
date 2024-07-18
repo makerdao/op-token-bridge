@@ -2,5 +2,9 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+solc = "0.8.21"
+fs_permissions = [
+    { access = "read", path = "./script/input/"},
+    { access = "read", path = "./out/"},
+    { access = "read-write", path = "./script/output/"}
+]
