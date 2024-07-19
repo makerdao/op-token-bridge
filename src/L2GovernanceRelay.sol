@@ -54,7 +54,7 @@ contract L2GovernanceRelay {
     function relay(address target, bytes calldata targetData) external onlyL1GovRelay {
         (bool success, bytes memory result) = target.delegatecall(targetData);
         if (!success) {
-            // Next 5 lines from https://ethereum.stackexchange.com/a/83577
+            // Next 3 lines are based on https://ethereum.stackexchange.com/a/83577
             if (result.length < 68) revert("L2GovernanceRelay/delegatecall-error");
             assembly { result := add(result, 0x04) }
             revert(abi.decode(result, (string)));

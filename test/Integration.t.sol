@@ -50,27 +50,28 @@ contract IntegrationTest is DssTest {
     L2TokenBridge l2Bridge;
     address L2_MESSENGER;
 
-    function setUp() public {} // TODO: setUp seems to cause a foundry bug whereby l2Domain is not actually persistent and incorrectly resets its log index
-
-    function _setUp() internal {
+    constructor() {
         vm.setEnv("FOUNDRY_ROOT_CHAINID", "1"); // used by ScriptTools to determine config path
+        // Note: need to set the domains here instead of in setUp() to make sure their storages are actually persistent
         string memory config = ScriptTools.loadConfig("config");
-
         l1Domain = new Domain(config, getChain("mainnet"));
+        l2Domain = new OptimismDomain(config, getChain("base"), l1Domain);
+    }
+
+    function setUp() public {
         l1Domain.selectFork();
         l1Domain.loadDssFromChainlog();
         dss = l1Domain.dss();
         PAUSE_PROXY = dss.chainlog.getAddress("MCD_PAUSE_PROXY");
-        vm.label(address(PAUSE_PROXY),  "PAUSE_PROXY");
+        vm.label(address(PAUSE_PROXY), "PAUSE_PROXY");
 
-        l2Domain = new OptimismDomain(config, getChain("base"), l1Domain);
         L1_MESSENGER = l2Domain.readConfigAddress("l1Messenger");
         L2_MESSENGER = l2Domain.readConfigAddress("l2Messenger");
         vm.label(L1_MESSENGER, "L1_MESSENGER");
         vm.label(L2_MESSENGER, "L2_MESSENGER");
 
         address l1GovRelay_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 3); // foundry increments a global nonce across domains
-        address l1Bridge_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 5); // foundry increments a global nonce across domains
+        address l1Bridge_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 5);
         l2Domain.selectFork();
         L2TokenBridgeInstance memory l2BridgeInstance = TokenBridgeDeploy.deployL2Bridge({
             deployer:    address(this),
@@ -140,8 +141,6 @@ contract IntegrationTest is DssTest {
     }
 
     function testDeposit() public {
-        _setUp();
-
         l1Domain.selectFork();
         l1Token.approve(address(l1Bridge), 100 ether);
         uint256 escrowBefore = l1Token.balanceOf(escrow);
