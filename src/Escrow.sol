@@ -61,7 +61,7 @@ contract Escrow {
     // --- approve ---
 
     function approve(address token, address spender, uint256 value) external auth {
-        emit Approve(token, spender, value);
         GemLike(token).approve(spender, value);
+        emit Approve(token, spender, value);
     }
 }
