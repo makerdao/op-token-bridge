@@ -43,6 +43,13 @@ contract L2TokenBridgeTest is DssTest {
         uint256 amount,
         bytes extraData
     );
+    event SentMessage(
+        address indexed target,
+        address sender,
+        bytes message,
+        uint256 messageNonce,
+        uint256 gasLimit
+    );
 
     GemMock l2Token;
     address l1Token = address(0x111);
@@ -52,7 +59,8 @@ contract L2TokenBridgeTest is DssTest {
     MessengerMock messenger;
 
     function setUp() public {
-        messenger = new MessengerMock(otherBridge);
+        messenger = new MessengerMock();
+        messenger.setXDomainMessageSender(otherBridge);
         bridge = new L2TokenBridge(otherBridge, address(messenger));
         l2Token = new GemMock(1_000_000 ether);
         l2Token.transfer(address(0xe0a), 500_000 ether);
@@ -100,7 +108,6 @@ contract L2TokenBridgeTest is DssTest {
         l2Token.approve(address(bridge), type(uint256).max);
         bridge.bridgeERC20To(address(l2Token), l1Token, address(0xb0b), 100 ether, 1_000_000, "");
 
-        
         vm.prank(address(messenger)); bridge.finalizeBridgeERC20(address(l2Token), l1Token, address(this), address(this), 1 ether, "");
 
         vm.expectEmit(true, true, true, true);
@@ -130,6 +137,14 @@ contract L2TokenBridgeTest is DssTest {
         vm.prank(address(0xe0a)); l2Token.approve(address(bridge), type(uint256).max);
 
         vm.expectEmit(true, true, true, true);
+        emit SentMessage(
+            otherBridge,
+            address(bridge),
+            abi.encodeCall(L2TokenBridge.finalizeBridgeERC20, (l1Token, address(l2Token), address(0xe0a), address(0xe0a), 100 ether, "abc")), 
+            0, 
+            1_000_000
+        );
+        vm.expectEmit(true, true, true, true);
         emit ERC20BridgeInitiated(address(l2Token), l1Token, address(0xe0a), address(0xe0a), 100 ether, "abc");
         vm.prank(address(0xe0a)); bridge.bridgeERC20(address(l2Token), l1Token, 100 ether, 1_000_000, "abc");
 
@@ -139,6 +154,14 @@ contract L2TokenBridgeTest is DssTest {
         uint256 thisBefore = l2Token.balanceOf(address(this));
         l2Token.approve(address(bridge), type(uint256).max);
 
+        vm.expectEmit(true, true, true, true);
+        emit SentMessage(
+            otherBridge,
+            address(bridge),
+            abi.encodeCall(L2TokenBridge.finalizeBridgeERC20, (l1Token, address(l2Token), address(this), address(0xb0b), 100 ether, "def")), 
+            0, 
+            1_000_000
+        );
         vm.expectEmit(true, true, true, true);
         emit ERC20BridgeInitiated(address(l2Token), l1Token, address(this), address(0xb0b), 100 ether, "def");
         bridge.bridgeERC20To(address(l2Token), l1Token, address(0xb0b), 100 ether, 1_000_000, "def");
@@ -150,7 +173,13 @@ contract L2TokenBridgeTest is DssTest {
     function testFinalizeBridgeERC20() public {
         vm.expectRevert("L2TokenBridge/not-from-other-bridge");
         bridge.finalizeBridgeERC20(address(l2Token), l1Token, address(0xb0b), address(0xced), 100 ether, "abc");
+        
+        messenger.setXDomainMessageSender(address(0));
 
+        vm.expectRevert("L2TokenBridge/not-from-other-bridge");
+        vm.prank(address(messenger)); bridge.finalizeBridgeERC20(address(l2Token), l1Token, address(0xb0b), address(0xced), 100 ether, "abc");
+
+        messenger.setXDomainMessageSender(otherBridge);
         uint256 balanceBefore = l2Token.balanceOf(address(0xced));
         uint256 supplyBefore = l2Token.totalSupply();
 

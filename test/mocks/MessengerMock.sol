@@ -19,6 +19,14 @@ pragma solidity ^0.8.21;
 
 contract MessengerMock {
     address public xDomainMessageSender;
-    constructor(address xDomainMessageSender_) { xDomainMessageSender = xDomainMessageSender_; }
-    function sendMessage(address _target, bytes calldata _message, uint32 _minGasLimit) external payable {}
+
+    event SentMessage(address indexed target, address sender, bytes message, uint256 messageNonce, uint256 gasLimit);
+
+    function setXDomainMessageSender(address xDomainMessageSender_) external {
+        xDomainMessageSender = xDomainMessageSender_;
+    }
+
+    function sendMessage(address _target, bytes calldata _message, uint32 _minGasLimit) external payable {
+        emit SentMessage(_target, msg.sender, _message, 0, _minGasLimit);
+    }
 }
