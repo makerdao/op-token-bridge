@@ -30,6 +30,17 @@ import { L1TokenBridge } from "src/L1TokenBridge.sol";
 import { L2TokenBridge } from "src/L2TokenBridge.sol";
 import { GemMock } from "test/mocks/GemMock.sol";
 
+interface SuperChainConfigLike {
+    function guardian() external returns (address);
+    function paused() external view returns (bool);
+    function pause(string memory) external;
+}
+
+interface L1CrossDomainMessengerLike {
+    function superchainConfig() external returns (address);
+    function paused() external view returns (bool);
+}
+
 contract IntegrationTest is DssTest {
 
     Domain l1Domain;
@@ -178,8 +189,36 @@ contract IntegrationTest is DssTest {
         vm.stopPrank();
 
         assertEq(l2Token.balanceOf(address(0xb0b)), 0);
+
         l2Domain.relayToHost(true);
 
         assertEq(l1Token.balanceOf(address(0xced)), 100 ether);
+    }
+
+    function testPausedWithdraw() public {
+        testDeposit();
+
+        l1Domain.selectFork();
+        L1CrossDomainMessengerLike l1Messenger = L1CrossDomainMessengerLike(L1_MESSENGER);
+        SuperChainConfigLike cfg = SuperChainConfigLike(l1Messenger.superchainConfig());
+        vm.prank(cfg.guardian()); cfg.pause("");
+        assertTrue(cfg.paused());
+        assertTrue(l1Messenger.paused());
+
+        l2Domain.selectFork();
+        vm.startPrank(address(0xb0b));
+        l2Token.approve(address(l2Bridge), 100 ether);
+        L2TokenBridge(l2Bridge).bridgeERC20To(
+            address(l2Token),
+            address(l1Token),
+            address(0xced),
+            100 ether,
+            1_000_000,
+            ""
+        );
+        vm.stopPrank();
+
+        vm.expectRevert("CrossDomainMessenger: paused");
+        l2Domain.relayToHost(true);
     }
 }
