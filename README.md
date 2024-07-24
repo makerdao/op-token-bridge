@@ -37,3 +37,19 @@ On mainnet, the bridge should be initialized via the spell process. Importantly,
 ```
 forge script script/Init.s.sol:Init --slow --multi --broadcast
 ```
+
+### Test the deployment
+
+Make sure the L1 deployer account holds at least 10^18 units of the first token listed under `"l1Tokens"` in `script/output/{chainId}/deployed-latest.json`. To perform a test deposit of that token, use the following command:
+
+```
+forge script script/Deposit.s.sol:Deposit --slow --multi --broadcast
+```
+
+To subsequently perform a test withdrawal, use the following command:
+
+```
+forge script script/Withdraw.s.sol:Withdraw --slow --multi --broadcast
+```
+
+The message can be relayed manually to L1 using the [Superchain Relayer](https://superchainrelayer.xyz/).
