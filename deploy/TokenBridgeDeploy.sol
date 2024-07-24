@@ -28,7 +28,7 @@ import { L1TokenBridge } from "src/L1TokenBridge.sol";
 import { L2TokenBridge } from "src/L2TokenBridge.sol";
 
 library TokenBridgeDeploy {
-    function deployL1Bridge(
+    function deployL1(
         address deployer,
         address owner,
         address l2GovRelay,
@@ -43,7 +43,7 @@ library TokenBridgeDeploy {
         ScriptTools.switchOwner(l1BridgeInstance.bridge, deployer, owner);
     }
 
-    function deployL2Bridge(
+    function deployL2(
         address deployer,
         address l1GovRelay,
         address l1Bridge,

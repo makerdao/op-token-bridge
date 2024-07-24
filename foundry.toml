@@ -8,3 +8,9 @@ fs_permissions = [
     { access = "read", path = "./out/"},
     { access = "read-write", path = "./script/output/"}
 ]
+
+[etherscan]
+mainnet = { key = "${ETHERSCAN_KEY}" }
+sepolia = { key = "${ETHERSCAN_KEY}", chain = 11155111 }
+base = { key = "${BASESCAN_KEY}", chain = 8453, url = "https://api.basescan.org/api" }
+base_sepolia = { key = "${BASESCAN_KEY}", chain = 84532, url = "https://api-sepolia.basescan.org/api" }

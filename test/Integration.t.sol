@@ -84,7 +84,7 @@ contract IntegrationTest is DssTest {
         address l1GovRelay_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 3); // foundry increments a global nonce across domains
         address l1Bridge_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 5);
         l2Domain.selectFork();
-        L2TokenBridgeInstance memory l2BridgeInstance = TokenBridgeDeploy.deployL2Bridge({
+        L2TokenBridgeInstance memory l2BridgeInstance = TokenBridgeDeploy.deployL2({
             deployer:    address(this),
             l1GovRelay:  l1GovRelay_,
             l1Bridge:    l1Bridge_, 
@@ -95,7 +95,7 @@ contract IntegrationTest is DssTest {
         assertEq(address(L2TokenBridgeSpell(l2BridgeInstance.spell).l2Bridge()), address(l2Bridge));
 
         l1Domain.selectFork();
-        L1TokenBridgeInstance memory l1BridgeInstance = TokenBridgeDeploy.deployL1Bridge({
+        L1TokenBridgeInstance memory l1BridgeInstance = TokenBridgeDeploy.deployL1({
             deployer:    address(this),
             owner:       PAUSE_PROXY,
             l2GovRelay:  l2BridgeInstance.govRelay,
