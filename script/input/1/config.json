@@ -7,7 +7,10 @@
     "base": {
       "l1Messenger": "0x866E82a600A1414e583f7F13623F1aC5d58b0Afa",
       "l2Messenger": "0x4200000000000000000000000000000000000007",
-      "tokens": []
+      "tokens": [],
+      "govRelayCLKey": "BASE_GOV_RELAY",
+      "escrowCLKey": "BASE_ESCROW",
+      "l1BridgeCLKey": "BASE_TOKEN_BRIDGE"
     }
   }
 }

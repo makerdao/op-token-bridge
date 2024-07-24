@@ -57,7 +57,7 @@ struct BridgesConfig {
 
 library TokenBridgeInit {
     function initBridges(
-        DssInstance memory            dss,
+        DssInstance memory           dss,
         L1TokenBridgeInstance memory l1BridgeInstance,
         L2TokenBridgeInstance memory l2BridgeInstance,
         BridgesConfig memory         cfg
