@@ -74,6 +74,7 @@ library TokenBridgeInit {
         require(l1GovRelay.l2GovernanceRelay() == l2BridgeInstance.govRelay, "TokenBridgeInit/l2-gov-relay-mismatch");
         require(l1GovRelay.messenger() == cfg.l1Messenger, "TokenBridgeInit/l1-gov-relay-messenger-mismatch");
         require(cfg.l1Tokens.length == cfg.l2Tokens.length, "TokenBridgeInit/token-arrays-mismatch");
+        require(cfg.minGasLimit <= 1_000_000_000, "TokenBridgeInit/min-gas-limit-out-of-bounds");
 
         for (uint256 i; i < cfg.l1Tokens.length; ++i) {
             (address l1Token, address l2Token) = (cfg.l1Tokens[i], cfg.l2Tokens[i]);
