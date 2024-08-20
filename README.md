@@ -24,7 +24,7 @@ To deposit a given amount of a supported token to the L2, Alice calls `bridgeERC
 
 ### L2 to L1 withdrawals
 
-To withdraw her tokens back to L1, Alice calls `bridgeERC20[To]()` on the `L2TokenBridge`. This call burns Alice's tokens and calls the [L2CrossDomainMessenger](https://github.com/ethereum-optimism/optimism/blob/9001eef4784dc2950d0bdcda29752cb2939bae2b/packages/contracts-bedrock/src/L2/L2CrossDomainMessenger.sol), which will eventually (after the ~7 days security period) allow the permissionless finalization of the withdrawal on L1. This will involve a call to `finalizeBridgeERC20()` on the `L1TokenBridge`, which releases an equivalent amount of L1 tokens from the `Escrow` to Alice.
+To withdraw her tokens back to L1, Alice calls `bridgeERC20[To]()` on the `L2TokenBridge`. This call burns Alice's tokens and calls the [L2CrossDomainMessenger](https://github.com/ethereum-optimism/optimism/blob/9001eef4784dc2950d0bdcda29752cb2939bae2b/packages/contracts-bedrock/src/L2/L2CrossDomainMessenger.sol), which will eventually (after the ~7 days security period) allow the permissionless finalization of the withdrawal on L1. This will involve a call to `finalizeBridgeERC20()` on the `L1TokenBridge`, which releases an equivalent amount of L1 tokens from the `Escrow` to Alice (or `to`).
 
 ## Upgrades
 
