@@ -98,7 +98,7 @@ contract IntegrationTest is DssTest {
         L1TokenBridgeInstance memory l1BridgeInstance = TokenBridgeDeploy.deployL1({
             deployer:    address(this),
             owner:       PAUSE_PROXY,
-            l2GovRelay:  l2GovRelay
+            l2GovRelay:  l2GovRelay,
             l2Bridge:    address(l2Bridge), 
             l1Messenger: L1_MESSENGER
         });
