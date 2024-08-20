@@ -20,7 +20,7 @@ The OP Token Bridge is a [custom bridge](https://docs.optimism.io/builders/app-d
 
 ### L1 to L2 deposits
 
-To deposit a given amount of a supported token to the L2, Alice calls `bridgeERC20[To]()` on the `L1TokenBridge`. This call locks Alice's tokens into the `Escrow` contract and calls the [L1CrossDomainMessenger](https://github.com/ethereum-optimism/optimism/blob/9001eef4784dc2950d0bdcda29752cb2939bae2b/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol) which instructs the sequencer to asynchroneously relay a cross-chain message on L2. This will involve a call to `finalizeBridgeERC20()` on `L2TokenBridge`, which mints an equivalent amount of L2 tokens for Alice.
+To deposit a given amount of a supported token to the L2, Alice calls `bridgeERC20[To]()` on the `L1TokenBridge`. This call locks Alice's tokens into the `Escrow` contract and calls the [L1CrossDomainMessenger](https://github.com/ethereum-optimism/optimism/blob/9001eef4784dc2950d0bdcda29752cb2939bae2b/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol) which instructs the sequencer to asynchroneously relay a cross-chain message on L2. This will involve a call to `finalizeBridgeERC20()` on `L2TokenBridge`, which mints an equivalent amount of L2 tokens for Alice (or `to`).
 
 ### L2 to L1 withdrawals
 
