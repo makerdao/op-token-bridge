@@ -10,7 +10,7 @@ The OP Token Bridge is a [custom bridge](https://docs.optimism.io/builders/app-d
 - `L2TokenBridge.sol` - L2 side of the bridge. Mints new L2 tokens after receiving a deposit message from `L1TokenBridge`. Burns L2 tokens when withdrawing them to L1.
 - `Escrow.sol` - Escrow contract that holds the bridged tokens on L1.
 - `L1GovernanceRelay.sol` - L1 side of the governance relay, which allows governance to exert admin control over the deployed L2 contracts.
-- `L2GovernanceRelay.sol` - L2 side of the governance relay
+- `L2GovernanceRelay.sol` - L2 side of the governance relay.
 
 ### External dependencies
 
