@@ -36,7 +36,6 @@ contract L2GovernanceRelayTest is DssTest {
 
     function setUp() public {
         messenger = new MessengerMock();
-        messenger.setXDomainMessageSender(l1GovRelay);
         relay = new L2GovernanceRelay(l1GovRelay, address(messenger));
         spell = address(new L2SpellMock());
     }
@@ -49,13 +48,15 @@ contract L2GovernanceRelayTest is DssTest {
     }
 
     function testRelay() public {
+        messenger.setXDomainMessageSender(l1GovRelay);
+
         vm.expectRevert("L2GovernanceRelay/not-from-l1-gov-relay");
-        relay.relay(spell, abi.encodeCall(L2SpellMock.exec, ()));
+        relay.relay(spell, abi.encodeCall(L2SpellMock.exec, ())); // revert due to wrong msg.sender
 
         messenger.setXDomainMessageSender(address(0));
 
         vm.expectRevert("L2GovernanceRelay/not-from-l1-gov-relay");
-        vm.prank(address(messenger)); relay.relay(spell, abi.encodeCall(L2SpellMock.exec, ()));
+        vm.prank(address(messenger)); relay.relay(spell, abi.encodeCall(L2SpellMock.exec, ())); // revert due to wrong xDomainMessageSender
 
         messenger.setXDomainMessageSender(l1GovRelay);
 
