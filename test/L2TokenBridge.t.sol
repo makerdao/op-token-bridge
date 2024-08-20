@@ -133,7 +133,7 @@ contract L2TokenBridgeTest is DssTest {
         vm.prank(address(0xe0a)); bridge.bridgeERC20(address(0xbad), address(0), 100 ether, 1_000_000, "");
 
         uint256 supplyBefore = l2Token.totalSupply();
-        uint256 eoaBefore = l2Token.balanceOf(address(this));
+        uint256 eoaBefore = l2Token.balanceOf(address(0xe0a));
         vm.prank(address(0xe0a)); l2Token.approve(address(bridge), type(uint256).max);
 
         vm.expectEmit(true, true, true, true);
