@@ -82,10 +82,10 @@ forge script script/Init.s.sol:Init --slow --multi --broadcast
 
 ### Test the deployment
 
-Make sure the L1 deployer account holds at least 10^18 units of the first token listed under `"l1Tokens"` in `script/output/{chainId}/deployed-latest.json`. To perform a test deposit of that token, use the following command:
+Make sure the L1 deployer account holds at least 10^18 units of the first token listed under `"l1Tokens"` in `script/output/{chainId}/deployed-latest.json`. To perform a test deposit of that token, use the following command (which includes a buffer to the gas estimation per Optimism's [recommendation](https://docs.optimism.io/builders/app-developers/bridging/messaging#for-l1-to-l2-transactions-1) for L1 => L2 transactions).
 
 ```
-forge script script/Deposit.s.sol:Deposit --slow --multi --broadcast
+forge script script/Deposit.s.sol:Deposit --slow --multi --broadcast --gas-estimate-multiplier 120
 ```
 
 To subsequently perform a test withdrawal, use the following command:
