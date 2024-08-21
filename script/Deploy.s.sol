@@ -30,7 +30,7 @@ library ScriptToolsExtended {
     VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
     function exportContracts(string memory name, string memory label, address[] memory addr) internal {
         name = vm.envOr("FOUNDRY_EXPORTS_NAME", name);
-        string memory json = vm.serializeAddress(ScriptTools.EXPORT_JSON_KEY, label, addr);
+        string memory json = vm.serializeAddress(string(abi.encodePacked(ScriptTools.EXPORT_JSON_KEY, "_", name)), label, addr);
         ScriptTools._doExport(name, json);
     }
 }
