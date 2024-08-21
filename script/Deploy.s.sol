@@ -25,31 +25,7 @@ import { TokenBridgeDeploy, L1TokenBridgeInstance, L2TokenBridgeInstance } from 
 import { ChainLog } from "deploy/mocks/ChainLog.sol";
 import { GemMock } from "test/mocks/GemMock.sol";
 
-// TODO: Add to dss-test/ScriptTools.sol
-library ScriptToolsExtended {
-    VmSafe private constant vm = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
-    function exportContracts(string memory name, string memory label, address[] memory addr) internal {
-        name = vm.envOr("FOUNDRY_EXPORTS_NAME", name);
-        string memory json = vm.serializeAddress(string(abi.encodePacked(ScriptTools.EXPORT_JSON_KEY, "_", name)), label, addr);
-        ScriptTools._doExport(name, json);
-    }
-}
-
-// TODO: Add to dss-test/domains/Domain.sol
-library DomainExtended {
-    using stdJson for string;
-    function hasConfigKey(Domain domain, string memory key) internal view returns (bool) {
-        bytes memory raw = domain.config().parseRaw(string.concat(".domains.", domain.details().chainAlias, ".", key));
-        return raw.length > 0;
-    }
-    function readConfigAddresses(Domain domain, string memory key) internal view returns (address[] memory) {
-        return domain.config().readAddressArray(string.concat(".domains.", domain.details().chainAlias, ".", key));
-    }
-}
-
 contract Deploy is Script {
-    using DomainExtended for Domain;
-
     address constant LOG = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
 
     uint256 l1PrivKey = vm.envUint("L1_PRIVATE_KEY");
@@ -156,7 +132,7 @@ contract Deploy is Script {
         ScriptTools.exportContract("deployed", "l1Bridge", l1Bridge);
         ScriptTools.exportContract("deployed", "l2Bridge", l2Bridge);
         ScriptTools.exportContract("deployed", "l2BridgeSpell", l2BridgeInstance.spell);
-        ScriptToolsExtended.exportContracts("deployed", "l1Tokens", l1Tokens);
-        ScriptToolsExtended.exportContracts("deployed", "l2Tokens", l2Tokens);
+        ScriptTools.exportContracts("deployed", "l1Tokens", l1Tokens);
+        ScriptTools.exportContracts("deployed", "l2Tokens", l2Tokens);
     }
 }
