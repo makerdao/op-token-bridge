@@ -123,7 +123,7 @@ contract L2TokenBridge {
         bytes memory _extraData
     ) internal {
         require(isOpen == 1, "L2TokenBridge/closed"); // do not allow initiating new xchain messages if bridge is closed
-        require(_remoteToken != address(0) && l1ToL2Token[_remoteToken] == _localToken, "L2TokenBridge/invalid-token");
+        require(_localToken != address(0) && l1ToL2Token[_remoteToken] == _localToken, "L2TokenBridge/invalid-token");
 
         TokenLike(_localToken).burn(msg.sender, _amount); // TODO: should l2Tokens allow authed burn?
 
@@ -185,7 +185,7 @@ contract L2TokenBridge {
         _initiateBridgeERC20(_localToken, _remoteToken, _to, _amount, _minGasLimit, _extraData);
     }
 
-    /// @notice Finalizes an ERC20 bridge on L2. Can only be triggered by the L2TokenBridge.
+    /// @notice Finalizes an ERC20 bridge on L2. Can only be triggered by the L1TokenBridge.
     /// @param _localToken  Address of the ERC20 on L2.
     /// @param _remoteToken Address of the corresponding token on L1.
     /// @param _from        Address of the sender.

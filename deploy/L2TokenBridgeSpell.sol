@@ -67,7 +67,7 @@ contract L2TokenBridgeSpell {
         L2GovRelayLike l2GovRelay = L2GovRelayLike(l2GovRelay_);
 
         // sanity checks
-        require(address(l2Bridge) == l2Bridge_, "L2TokenBridgeSpell/l2-gateway-mismatch");
+        require(address(l2Bridge) == l2Bridge_, "L2TokenBridgeSpell/l2-bridge-mismatch");
         require(l2Bridge.isOpen() == 1, "L2TokenBridgeSpell/not-open");
         require(l2Bridge.otherBridge() == l1Bridge, "L2TokenBridgeSpell/other-bridge-mismatch");
         require(l2Bridge.messenger() == l2Messenger, "L2TokenBridgeSpell/l2-bridge-messenger-mismatch");
