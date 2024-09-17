@@ -37,7 +37,7 @@ library TokenBridgeDeploy {
     ) internal returns (L1TokenBridgeInstance memory l1BridgeInstance) {
         l1BridgeInstance.govRelay = address(new L1GovernanceRelay(l2GovRelay, l1Messenger));
         l1BridgeInstance.escrow = address(new Escrow());
-        l1BridgeInstance.bridge = address(new L1TokenBridge(l2Bridge, l1BridgeInstance.escrow, l1Messenger));
+        l1BridgeInstance.bridge = address(new L1TokenBridge(l2Bridge, l1Messenger));
         ScriptTools.switchOwner(l1BridgeInstance.govRelay, deployer, owner);
         ScriptTools.switchOwner(l1BridgeInstance.escrow, deployer, owner);
         ScriptTools.switchOwner(l1BridgeInstance.bridge, deployer, owner);

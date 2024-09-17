@@ -32,17 +32,18 @@ contract L1TokenBridge {
     mapping(address => uint256) public wards;
     mapping(address => address) public l1ToL2Token;
     uint256 public isOpen = 1;
+    address public escrow;
 
     // --- immutables ---
 
     address public immutable otherBridge;
-    address public immutable escrow;
     CrossDomainMessengerLike public immutable messenger;
 
     // --- events ---
 
     event Rely(address indexed usr);
     event Deny(address indexed usr);
+    event File(bytes32 indexed what, address data);
     event Closed();
     event TokenSet(address indexed l1Token, address indexed l2Token);
     event ERC20BridgeInitiated(
@@ -81,11 +82,9 @@ contract L1TokenBridge {
 
     constructor(
         address _otherBridge,
-        address _escrow,
         address _messenger
     ) {
         otherBridge = _otherBridge;
-        escrow = _escrow;
         messenger = CrossDomainMessengerLike(_messenger);
 
         wards[msg.sender] = 1;
@@ -102,6 +101,13 @@ contract L1TokenBridge {
     function deny(address usr) external auth {
         wards[usr] = 0;
         emit Deny(usr);
+    }
+
+    function file(bytes32 what, address data) external auth {
+        if (what == "escrow") {
+            escrow = data;
+        } else revert("L1TokenBridge/file-unrecognized-param");
+        emit File(what, data);
     }
 
     function close() external auth {
