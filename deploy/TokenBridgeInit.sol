@@ -27,7 +27,8 @@ interface L1TokenBridgeLike {
     function otherBridge() external view returns (address);
     function escrow() external view returns (address);
     function messenger() external view returns (address);
-    function registerToken(address l1Token, address l2Token) external;
+    function file(bytes32, address) external;
+    function registerToken(address, address) external;
 }
 
 interface L1RelayLike {
@@ -69,12 +70,13 @@ library TokenBridgeInit {
         // sanity checks
         require(l1Bridge.isOpen() == 1, "TokenBridgeInit/not-open");
         require(l1Bridge.otherBridge() == l2BridgeInstance.bridge, "TokenBridgeInit/other-bridge-mismatch");
-        require(l1Bridge.escrow() == address(escrow), "TokenBridgeInit/escrow-mismatch");
         require(l1Bridge.messenger() == cfg.l1Messenger, "TokenBridgeInit/l1-bridge-messenger-mismatch");
         require(l1GovRelay.l2GovernanceRelay() == l2BridgeInstance.govRelay, "TokenBridgeInit/l2-gov-relay-mismatch");
         require(l1GovRelay.messenger() == cfg.l1Messenger, "TokenBridgeInit/l1-gov-relay-messenger-mismatch");
         require(cfg.l1Tokens.length == cfg.l2Tokens.length, "TokenBridgeInit/token-arrays-mismatch");
         require(cfg.minGasLimit <= 1_000_000_000, "TokenBridgeInit/min-gas-limit-out-of-bounds");
+
+        l1Bridge.file("escrow", address(escrow));
 
         for (uint256 i; i < cfg.l1Tokens.length; ++i) {
             (address l1Token, address l2Token) = (cfg.l1Tokens[i], cfg.l2Tokens[i]);

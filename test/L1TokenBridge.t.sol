@@ -61,7 +61,8 @@ contract L1TokenBridgeTest is DssTest {
     function setUp() public {
         messenger = new MessengerMock();
         messenger.setXDomainMessageSender(otherBridge);
-        bridge = new L1TokenBridge(otherBridge, escrow, address(messenger));
+        bridge = new L1TokenBridge(otherBridge, address(messenger));
+        bridge.file("escrow", escrow);
         l1Token = new GemMock(1_000_000 ether);
         l1Token.transfer(address(0xe0a), 500_000 ether);
         vm.prank(escrow); l1Token.approve(address(bridge), type(uint256).max);
@@ -71,12 +72,11 @@ contract L1TokenBridgeTest is DssTest {
     function testConstructor() public {
         vm.expectEmit(true, true, true, true);
         emit Rely(address(this));
-        L1TokenBridge b = new L1TokenBridge(address(111), address(222), address(333));
+        L1TokenBridge b = new L1TokenBridge(address(111), address(222));
 
         assertEq(b.isOpen(), 1);
         assertEq(b.otherBridge(), address(111));
-        assertEq(b.escrow(), address(222));
-        assertEq(address(b.messenger()), address(333));
+        assertEq(address(b.messenger()), address(222));
         assertEq(b.wards(address(this)), 1);
     }
 
@@ -91,6 +91,10 @@ contract L1TokenBridgeTest is DssTest {
             bridge.close.selector,
             bridge.registerToken.selector
         ]);
+    }
+
+    function testFileAddress() public {
+        checkFileAddress(address(bridge), "L1TokenBridge", ["escrow"]);
     }
 
     function testTokenRegistration() public {
