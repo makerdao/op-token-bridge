@@ -25,7 +25,6 @@ interface L1TokenBridgeLike {
     function l1ToL2Token(address) external view returns (address);
     function isOpen() external view returns (uint256);
     function otherBridge() external view returns (address);
-    function escrow() external view returns (address);
     function messenger() external view returns (address);
     function file(bytes32, address) external;
     function registerToken(address, address) external;
