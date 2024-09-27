@@ -49,6 +49,7 @@ struct BridgesConfig {
     address l2Messenger;
     address[] l1Tokens;
     address[] l2Tokens;
+    uint256[] maxWithdraws;
     uint32 minGasLimit;
     bytes32 govRelayCLKey;
     bytes32 escrowCLKey;
@@ -73,6 +74,7 @@ library TokenBridgeInit {
         require(l1GovRelay.l2GovernanceRelay() == l2BridgeInstance.govRelay, "TokenBridgeInit/l2-gov-relay-mismatch");
         require(l1GovRelay.messenger() == cfg.l1Messenger, "TokenBridgeInit/l1-gov-relay-messenger-mismatch");
         require(cfg.l1Tokens.length == cfg.l2Tokens.length, "TokenBridgeInit/token-arrays-mismatch");
+        require(cfg.maxWithdraws.length == cfg.l2Tokens.length, "TokenBridgeInit/max-withdraws-length-mismatch");
         require(cfg.minGasLimit <= 1_000_000_000, "TokenBridgeInit/min-gas-limit-out-of-bounds");
 
         l1Bridge.file("escrow", address(escrow));
@@ -81,6 +83,7 @@ library TokenBridgeInit {
             (address l1Token, address l2Token) = (cfg.l1Tokens[i], cfg.l2Tokens[i]);
             require(l1Token != address(0), "TokenBridgeInit/invalid-l1-token");
             require(l2Token != address(0), "TokenBridgeInit/invalid-l2-token");
+            require(cfg.maxWithdraws[i] > 0, "TokenBridgeInit/max-withdraw-not-set");
             require(l1Bridge.l1ToL2Token(l1Token) == address(0), "TokenBridgeInit/existing-l1-token");
 
             l1Bridge.registerToken(l1Token, l2Token);
@@ -96,7 +99,8 @@ library TokenBridgeInit {
                 address(l1Bridge),
                 cfg.l2Messenger,
                 cfg.l1Tokens,
-                cfg.l2Tokens
+                cfg.l2Tokens,
+                cfg.maxWithdraws
             )),
             minGasLimit: cfg.minGasLimit
         });

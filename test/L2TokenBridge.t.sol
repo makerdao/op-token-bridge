@@ -26,6 +26,7 @@ import { MessengerMock } from "test/mocks/MessengerMock.sol";
 contract L2TokenBridgeTest is DssTest {
 
     event TokenSet(address indexed l1Address, address indexed l2Address);
+    event MaxWithdrawSet(address indexed l2Token, uint256 maxWithdraw);
     event Closed();
     event ERC20BridgeInitiated(
         address indexed localToken,
@@ -66,6 +67,7 @@ contract L2TokenBridgeTest is DssTest {
         l2Token.transfer(address(0xe0a), 500_000 ether);
         l2Token.rely(address(bridge));
         bridge.registerToken(l1Token, address(l2Token));
+        bridge.setMaxWithdraw(address(l2Token), 1_000_000 ether);
     }
 
     function testConstructor() public {
@@ -88,7 +90,8 @@ contract L2TokenBridgeTest is DssTest {
 
         checkModifier(address(bridge), string(abi.encodePacked("L2TokenBridge", "/not-authorized")), [
             bridge.close.selector,
-            bridge.registerToken.selector
+            bridge.registerToken.selector,
+            bridge.setMaxWithdraw.selector
         ]);
     }
 
@@ -100,6 +103,16 @@ contract L2TokenBridgeTest is DssTest {
         bridge.registerToken(address(11), address(22));
 
         assertEq(bridge.l1ToL2Token(address(11)), address(22));
+    }
+
+    function testSetmaxWithdraw() public {
+        assertEq(bridge.maxWithdraws(address(22)), 0);
+
+        vm.expectEmit(true, true, true, true);
+        emit MaxWithdrawSet(address(22), 123);
+        bridge.setMaxWithdraw(address(22), 123);
+
+        assertEq(bridge.maxWithdraws(address(22)), 123);
     }
 
     function testClose() public {
@@ -131,6 +144,9 @@ contract L2TokenBridgeTest is DssTest {
 
         vm.expectRevert("L2TokenBridge/invalid-token");
         vm.prank(address(0xe0a)); bridge.bridgeERC20(address(0), address(0xbad), 100 ether, 1_000_000, "");
+
+        vm.expectRevert("L2TokenBridge/amount-too-large");
+        vm.prank(address(0xe0a)); bridge.bridgeERC20(address(l2Token), l1Token, 1_000_000 ether + 1, 1_000_000, "");
 
         uint256 supplyBefore = l2Token.totalSupply();
         uint256 eoaBefore = l2Token.balanceOf(address(0xe0a));

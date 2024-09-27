@@ -32,6 +32,7 @@ contract L2TokenBridge {
 
     mapping(address => uint256) public wards;
     mapping(address => address) public l1ToL2Token;
+    mapping(address => uint256) public maxWithdraws;
     uint256 public isOpen = 1;
 
     // --- immutables ---
@@ -45,6 +46,7 @@ contract L2TokenBridge {
     event Deny(address indexed usr);
     event Closed();
     event TokenSet(address indexed l1Token, address indexed l2Token);
+    event MaxWithdrawSet(address indexed l2Token, uint256 maxWithdraw);
     event ERC20BridgeInitiated(
         address indexed localToken,
         address indexed remoteToken,
@@ -112,6 +114,11 @@ contract L2TokenBridge {
         emit TokenSet(l1Token, l2Token);
     }
 
+    function setMaxWithdraw(address l2Token, uint256 maxWithdraw) external auth {
+        maxWithdraws[l2Token] = maxWithdraw;
+        emit MaxWithdrawSet(l2Token, maxWithdraw);
+    }
+
     // -- bridging --
 
     function _initiateBridgeERC20(
@@ -124,6 +131,7 @@ contract L2TokenBridge {
     ) internal {
         require(isOpen == 1, "L2TokenBridge/closed"); // do not allow initiating new xchain messages if bridge is closed
         require(_localToken != address(0) && l1ToL2Token[_remoteToken] == _localToken, "L2TokenBridge/invalid-token");
+        require(_amount <= maxWithdraws[_localToken], "L2TokenBridge/amount-too-large");
 
         TokenLike(_localToken).burn(msg.sender, _amount); // TODO: should l2Tokens allow authed burn?
 

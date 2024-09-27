@@ -51,10 +51,14 @@ contract Init is Script {
         cfg.l2Messenger   = deps.readAddress(".l2Messenger");
         cfg.l1Tokens      = deps.readAddressArray(".l1Tokens");
         cfg.l2Tokens      = deps.readAddressArray(".l2Tokens");
+        cfg.maxWithdraws  = new uint256[](cfg.l2Tokens.length);
         cfg.minGasLimit   = 100_000;
         cfg.govRelayCLKey = l2Domain.readConfigBytes32FromString("govRelayCLKey");
         cfg.escrowCLKey   = l2Domain.readConfigBytes32FromString("escrowCLKey");
         cfg.l1BridgeCLKey = l2Domain.readConfigBytes32FromString("l1BridgeCLKey");
+        for (uint256 i; i < cfg.maxWithdraws.length; ++i) {
+            cfg.maxWithdraws[i] = 10_000_000 ether;
+        }
 
         L1TokenBridgeInstance memory l1BridgeInstance = L1TokenBridgeInstance({
             govRelay: deps.readAddress(".l1GovRelay"),
