@@ -26,6 +26,8 @@ interface L1TokenBridgeLike {
     function isOpen() external view returns (uint256);
     function otherBridge() external view returns (address);
     function messenger() external view returns (address);
+    function version() external view returns (string memory);
+    function getImplementation() external view returns (address);
     function file(bytes32, address) external;
     function registerToken(address, address) external;
 }
@@ -68,6 +70,8 @@ library TokenBridgeInit {
         L1TokenBridgeLike l1Bridge = L1TokenBridgeLike(l1BridgeInstance.bridge);
 
         // sanity checks
+        require(keccak256(bytes(l1Bridge.version())) == keccak256("1"), "TokenBridgeInit/version-does-not-match");
+        require(l1Bridge.getImplementation() == l1BridgeInstance.bridgeImp, "TokenBridgeInit/imp-does-not-match");
         require(l1Bridge.isOpen() == 1, "TokenBridgeInit/not-open");
         require(l1Bridge.otherBridge() == l2BridgeInstance.bridge, "TokenBridgeInit/other-bridge-mismatch");
         require(l1Bridge.messenger() == cfg.l1Messenger, "TokenBridgeInit/l1-bridge-messenger-mismatch");
@@ -95,6 +99,7 @@ library TokenBridgeInit {
             targetData:  abi.encodeCall(L2TokenBridgeSpell.init, (
                 l2BridgeInstance.govRelay,
                 l2BridgeInstance.bridge,
+                l2BridgeInstance.bridgeImp,
                 address(l1GovRelay),
                 address(l1Bridge),
                 cfg.l2Messenger,

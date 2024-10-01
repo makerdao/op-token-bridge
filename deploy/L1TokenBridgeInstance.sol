@@ -20,4 +20,5 @@ struct L1TokenBridgeInstance {
     address govRelay;
     address escrow;
     address bridge;
+    address bridgeImp;
 }

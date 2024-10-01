@@ -12,6 +12,8 @@ The OP Token Bridge is a [custom bridge](https://docs.optimism.io/builders/app-d
 - `L1GovernanceRelay.sol` - L1 side of the governance relay, which allows governance to exert admin control over the deployed L2 contracts.
 - `L2GovernanceRelay.sol` - L2 side of the governance relay.
 
+The `L1TokenBridge` and `L2TokenBridge` contracts use the ERC-1822 UUPS pattern for upgradeability and the ERC-1967 proxy storage slots standard. It is important that the `TokenBridgeDeploy` library sequences be used for deploying.
+
 ### External dependencies
 
 - The L2 implementations of the bridged tokens are not provided as part of this repository and are assumed to exist in external repositories. It is assumed that only simple, regular ERC20 tokens will be used with this bridge. In particular, the supported tokens are assumed to revert on failure (instead of returning false) and do not execute any hook on transfer.
@@ -39,6 +41,13 @@ To migrate a single token to a new bridge, follow the steps below:
 
 1. Deploy the new token bridge and connect it to the same escrow as the one used by this bridge.
 2. Unregister the token on both `L1TokenBridge` and `L2TokenBridge`, so that no new outbound message can be sent to the other side of the bridge for that token.
+
+## Tests
+
+### OZ upgradeability validations
+
+The OZ validations can be run alongside the existing tests:  
+`VALIDATE=true forge test --ffi --build-info --extra-output storageLayout`
 
 ## Deployment
 

@@ -61,14 +61,16 @@ contract Init is Script {
         }
 
         L1TokenBridgeInstance memory l1BridgeInstance = L1TokenBridgeInstance({
-            govRelay: deps.readAddress(".l1GovRelay"),
-            escrow:   deps.readAddress(".escrow"),
-            bridge:   deps.readAddress(".l1Bridge")
+            govRelay:  deps.readAddress(".l1GovRelay"),
+            escrow:    deps.readAddress(".escrow"),
+            bridge:    deps.readAddress(".l1Bridge"),
+            bridgeImp: deps.readAddress(".l1BridgeImp")
         });
         L2TokenBridgeInstance memory l2BridgeInstance = L2TokenBridgeInstance({
-            govRelay: deps.readAddress(".l2GovRelay"),
-            spell:    deps.readAddress(".l2BridgeSpell"),
-            bridge:   deps.readAddress(".l2Bridge")
+            govRelay:  deps.readAddress(".l2GovRelay"),
+            spell:     deps.readAddress(".l2BridgeSpell"),
+            bridge:    deps.readAddress(".l2Bridge"),
+            bridgeImp: deps.readAddress(".l2BridgeImp")
         });
 
         vm.startBroadcast(l1PrivKey);

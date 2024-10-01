@@ -18,6 +18,7 @@ pragma solidity >=0.8.0;
 
 import { ScriptTools } from "dss-test/ScriptTools.sol";
 
+import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import { L1TokenBridgeInstance } from "./L1TokenBridgeInstance.sol";
 import { L2TokenBridgeInstance } from "./L2TokenBridgeInstance.sol";
 import { L2TokenBridgeSpell } from "./L2TokenBridgeSpell.sol";
@@ -37,7 +38,9 @@ library TokenBridgeDeploy {
     ) internal returns (L1TokenBridgeInstance memory l1BridgeInstance) {
         l1BridgeInstance.govRelay = address(new L1GovernanceRelay(l2GovRelay, l1Messenger));
         l1BridgeInstance.escrow = address(new Escrow());
-        l1BridgeInstance.bridge = address(new L1TokenBridge(l2Bridge, l1Messenger));
+        l1BridgeInstance.bridgeImp = address(new L1TokenBridge(l2Bridge, l1Messenger));
+        l1BridgeInstance.bridge = address(new ERC1967Proxy(l1BridgeInstance.bridgeImp, abi.encodeCall(L1TokenBridge.initialize, ())));
+
         ScriptTools.switchOwner(l1BridgeInstance.govRelay, deployer, owner);
         ScriptTools.switchOwner(l1BridgeInstance.escrow, deployer, owner);
         ScriptTools.switchOwner(l1BridgeInstance.bridge, deployer, owner);
@@ -50,7 +53,8 @@ library TokenBridgeDeploy {
         address l2Messenger
     ) internal returns (L2TokenBridgeInstance memory l2BridgeInstance) {
         l2BridgeInstance.govRelay = address(new L2GovernanceRelay(l1GovRelay, l2Messenger));
-        l2BridgeInstance.bridge = address(new L2TokenBridge(l1Bridge, l2Messenger));
+        l2BridgeInstance.bridgeImp = address(new L2TokenBridge(l1Bridge, l2Messenger));
+        l2BridgeInstance.bridge = address(new ERC1967Proxy(l2BridgeInstance.bridgeImp, abi.encodeCall(L2TokenBridge.initialize, ())));
         l2BridgeInstance.spell = address(new L2TokenBridgeSpell(l2BridgeInstance.bridge));
         ScriptTools.switchOwner(l2BridgeInstance.bridge, deployer, l2BridgeInstance.govRelay);
     }
