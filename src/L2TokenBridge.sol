@@ -98,6 +98,8 @@ contract L2TokenBridge is UUPSUpgradeable {
     string public constant version = "1";
 
     function initialize() initializer external {
+        __UUPSUpgradeable_init();
+
         isOpen = 1;
         wards[msg.sender] = 1;
         emit Rely(msg.sender);
