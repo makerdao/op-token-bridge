@@ -29,6 +29,7 @@ interface L2TokenBridgeLike {
     function deny(address) external;
     function close() external;
     function registerToken(address, address) external;
+    function setMaxWithdraw(address, uint256) external;
 }
 
 interface AuthLike {
@@ -54,6 +55,13 @@ contract L2TokenBridgeSpell {
             unchecked { ++i; }
         }
     }
+
+    function setMaxWithdraws(address[] memory l2Tokens, uint256[] memory maxWithdraws) public { 
+        for (uint256 i; i < l2Tokens.length;) {
+            l2Bridge.setMaxWithdraw(l2Tokens[i], maxWithdraws[i]);
+            unchecked { ++i; }
+        }
+    }
     
     function init(
         address l2GovRelay_,
@@ -62,7 +70,8 @@ contract L2TokenBridgeSpell {
         address l1Bridge,
         address l2Messenger,
         address[] calldata l1Tokens,
-        address[] calldata l2Tokens
+        address[] calldata l2Tokens,
+        uint256[] calldata maxWithdraws
     ) external {
         L2GovRelayLike l2GovRelay = L2GovRelayLike(l2GovRelay_);
 
@@ -75,5 +84,6 @@ contract L2TokenBridgeSpell {
         require(l2GovRelay.messenger() == l2Messenger, "L2TokenBridgeSpell/l2-gov-relay-messenger-mismatch");
 
         registerTokens(l1Tokens, l2Tokens);
+        setMaxWithdraws(l2Tokens, maxWithdraws);
     }
 }
