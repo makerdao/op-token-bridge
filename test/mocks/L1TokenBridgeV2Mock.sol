@@ -25,7 +25,7 @@ contract L1TokenBridgeV2Mock is UUPSUpgradeable {
     uint256 public isOpen;
     address public escrow;
 
-    string public constant version  = "2";
+    string public constant version = "2";
 
     event UpgradedTo(string version);
 

@@ -25,7 +25,7 @@ contract L2TokenBridgeV2Mock is UUPSUpgradeable {
     mapping(address => uint256) public maxWithdraws;
     uint256 public isOpen;
 
-    string public constant version  = "2";
+    string public constant version = "2";
 
     event UpgradedTo(string version);
 
