@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.21;
 
-import { L2TokenBridge, UUPSUpgradeable, ERC1967Utils, Initializable } from "src/L2TokenBridge.sol";
+import { UUPSUpgradeable, ERC1967Utils } from "src/L2TokenBridge.sol";
 
 contract L2TokenBridgeV2Mock is UUPSUpgradeable {
     mapping(address => uint256) public wards;

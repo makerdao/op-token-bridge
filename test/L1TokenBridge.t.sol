@@ -97,7 +97,8 @@ contract L1TokenBridgeTest is DssTest {
 
         checkModifier(address(bridge), string(abi.encodePacked("L1TokenBridge", "/not-authorized")), [
             bridge.close.selector,
-            bridge.registerToken.selector
+            bridge.registerToken.selector,
+            bridge.upgradeToAndCall.selector
         ]);
     }
 
@@ -257,12 +258,6 @@ contract L1TokenBridgeTest is DssTest {
         assertTrue(implementation1 != implementation2);
         assertEq(bridge.version(), "2");
         assertEq(bridge.wards(address(this)), 1); // still a ward
-    }
-
-    function testUpgradeUnauthed() public {
-        address newImpl = address(new L1TokenBridgeV2Mock());
-        vm.expectRevert("L1TokenBridge/not-authorized");
-        vm.prank(address(0x123)); bridge.upgradeToAndCall(newImpl, abi.encodeCall(L1TokenBridgeV2Mock.reinitialize, ()));
     }
 
     function testInitializeAgain() public {

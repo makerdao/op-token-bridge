@@ -47,15 +47,16 @@ contract Init is Script {
         DssInstance memory dss = MCD.loadFromChainlog(deps.readAddress(".chainlog"));
 
         BridgesConfig memory cfg; 
-        cfg.l1Messenger   = deps.readAddress(".l1Messenger");
-        cfg.l2Messenger   = deps.readAddress(".l2Messenger");
-        cfg.l1Tokens      = deps.readAddressArray(".l1Tokens");
-        cfg.l2Tokens      = deps.readAddressArray(".l2Tokens");
-        cfg.maxWithdraws  = new uint256[](cfg.l2Tokens.length);
-        cfg.minGasLimit   = 100_000;
-        cfg.govRelayCLKey = l2Domain.readConfigBytes32FromString("govRelayCLKey");
-        cfg.escrowCLKey   = l2Domain.readConfigBytes32FromString("escrowCLKey");
-        cfg.l1BridgeCLKey = l2Domain.readConfigBytes32FromString("l1BridgeCLKey");
+        cfg.l1Messenger      = deps.readAddress(".l1Messenger");
+        cfg.l2Messenger      = deps.readAddress(".l2Messenger");
+        cfg.l1Tokens         = deps.readAddressArray(".l1Tokens");
+        cfg.l2Tokens         = deps.readAddressArray(".l2Tokens");
+        cfg.maxWithdraws     = new uint256[](cfg.l2Tokens.length);
+        cfg.minGasLimit      = 100_000;
+        cfg.govRelayCLKey    = l2Domain.readConfigBytes32FromString("govRelayCLKey");
+        cfg.escrowCLKey      = l2Domain.readConfigBytes32FromString("escrowCLKey");
+        cfg.l1BridgeCLKey    = l2Domain.readConfigBytes32FromString("l1BridgeCLKey");
+        cfg.l1BridgeImpCLKey = l2Domain.readConfigBytes32FromString("l1BridgeImpCLKey");
         for (uint256 i; i < cfg.maxWithdraws.length; ++i) {
             cfg.maxWithdraws[i] = 10_000_000 ether;
         }

@@ -36,10 +36,11 @@ contract L1TokenBridge is UUPSUpgradeable {
     uint256 public isOpen;
     address public escrow;
 
-    // --- immutables ---
+    // --- immutables and const ---
 
     address public immutable otherBridge;
     CrossDomainMessengerLike public immutable messenger;
+    string public constant version = "1";
 
     // --- events ---
 
@@ -93,8 +94,6 @@ contract L1TokenBridge is UUPSUpgradeable {
     }
 
     // --- upgradability ---
-
-    string public constant version = "1";
 
     function initialize() initializer external {
         __UUPSUpgradeable_init();

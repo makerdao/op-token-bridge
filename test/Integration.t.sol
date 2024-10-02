@@ -133,15 +133,16 @@ contract IntegrationTest is DssTest {
         uint256[] memory maxWithdraws = new uint256[](1);
         maxWithdraws[0] = 10_000_000 ether;
         BridgesConfig memory cfg = BridgesConfig({
-            l1Messenger:   L1_MESSENGER,
-            l2Messenger:   L2_MESSENGER,
-            l1Tokens:      l1Tokens,
-            l2Tokens:      l2Tokens,
-            maxWithdraws:  maxWithdraws,
-            minGasLimit:   1_000_000,
-            govRelayCLKey: "BASE_GOV_RELAY",
-            escrowCLKey:   "BASE_ESCROW",
-            l1BridgeCLKey: "BASE_TOKEN_BRIDGE"
+            l1Messenger:      L1_MESSENGER,
+            l2Messenger:      L2_MESSENGER,
+            l1Tokens:         l1Tokens,
+            l2Tokens:         l2Tokens,
+            maxWithdraws:     maxWithdraws,
+            minGasLimit:      1_000_000,
+            govRelayCLKey:    "BASE_GOV_RELAY",
+            escrowCLKey:      "BASE_ESCROW",
+            l1BridgeCLKey:    "BASE_TOKEN_BRIDGE",
+            l1BridgeImpCLKey: "BASE_TOKEN_BRIDGE_IMP"
         });
 
         l1Domain.selectFork();
@@ -155,6 +156,7 @@ contract IntegrationTest is DssTest {
         assertEq(dss.chainlog.getAddress("BASE_GOV_RELAY"),    l1GovRelay);
         assertEq(dss.chainlog.getAddress("BASE_ESCROW"),       escrow);
         assertEq(dss.chainlog.getAddress("BASE_TOKEN_BRIDGE"), l1Bridge_);
+        assertEq(dss.chainlog.getAddress("BASE_TOKEN_BRIDGE_IMP"), l1BridgeInstance.bridgeImp);
 
         l2Domain.relayFromHost(true);
 

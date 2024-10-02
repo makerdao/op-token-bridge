@@ -10,7 +10,8 @@
       "tokens": [],
       "govRelayCLKey": "BASE_GOV_RELAY",
       "escrowCLKey": "BASE_ESCROW",
-      "l1BridgeCLKey": "BASE_TOKEN_BRIDGE"
+      "l1BridgeCLKey": "BASE_TOKEN_BRIDGE",
+      "l1BridgeImpCLKey": "BASE_TOKEN_BRIDGE_IMP"
     }
   }
 }

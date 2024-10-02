@@ -37,10 +37,11 @@ contract L2TokenBridge is UUPSUpgradeable {
     mapping(address => uint256) public maxWithdraws;
     uint256 public isOpen;
 
-    // --- immutables ---
+    // --- immutables and const ---
 
     address public immutable otherBridge;
     CrossDomainMessengerLike public immutable messenger;
+    string public constant version = "1";
 
     // --- events ---
 
@@ -94,8 +95,6 @@ contract L2TokenBridge is UUPSUpgradeable {
     }
 
     // --- upgradability ---
-
-    string public constant version = "1";
 
     function initialize() initializer external {
         __UUPSUpgradeable_init();
@@ -152,7 +151,7 @@ contract L2TokenBridge is UUPSUpgradeable {
         require(_localToken != address(0) && l1ToL2Token[_remoteToken] == _localToken, "L2TokenBridge/invalid-token");
         require(_amount <= maxWithdraws[_localToken], "L2TokenBridge/amount-too-large");
 
-        TokenLike(_localToken).burn(msg.sender, _amount); // TODO: should l2Tokens allow authed burn?
+        TokenLike(_localToken).burn(msg.sender, _amount);
 
         messenger.sendMessage({
             _target: address(otherBridge),

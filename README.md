@@ -30,7 +30,13 @@ To withdraw her tokens back to L1, Alice calls `bridgeERC20[To]()` on the `L2Tok
 
 ## Upgrades
 
+### Upgrade the bridge implementation(s)
+
+`L1TokenBridge` and/or `L2TokenBridge` implementations can be upgraded by calling the `upgradeToAndCall` function of their inherited `UUPSUpgradeable` parent. Special care must be taken to ensure any deposit or withdrawal that is in transit at the time of the upgrade will still be able to get confirmed on the destination side.
+
 ### Upgrade to a new bridge (and deprecate this bridge)
+
+As an alternative upgrade mechanism, a new bridge can be deployed to be used with the escrow.
 
 1. Deploy the new token bridge and connect it to the same escrow as the one used by this bridge. The old and new bridges can operate in parallel.
 2. Optionally, deprecate the old bridge by closing it. This involves calling `close()` on both the `L1TokenBridge` and `L2TokenBridge` so that no new outbound message can be sent to the other side of the bridge. After all cross-chain messages are done processing (can take ~1 week), the bridge is effectively closed and governance can consider revoking the approval to transfer funds from the escrow on L1 and the token minting rights on L2.

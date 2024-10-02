@@ -6,7 +6,8 @@
       "l2Messenger": "0x4200000000000000000000000000000000000007",
       "govRelayCLKey": "BASE_GOV_RELAY",
       "escrowCLKey": "BASE_ESCROW",
-      "l1BridgeCLKey": "BASE_TOKEN_BRIDGE"
+      "l1BridgeCLKey": "BASE_TOKEN_BRIDGE",
+      "l1BridgeImpCLKey": "BASE_TOKEN_BRIDGE_IMP"
     }
   }
 }
