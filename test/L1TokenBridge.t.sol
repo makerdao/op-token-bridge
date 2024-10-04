@@ -19,8 +19,9 @@ pragma solidity ^0.8.21;
 
 import "dss-test/DssTest.sol";
 import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { Upgrades, Options } from "openzeppelin-foundry-upgrades/Upgrades.sol";
-import { L1TokenBridge, UUPSUpgradeable, ERC1967Utils, Initializable } from "src/L1TokenBridge.sol";
+import { L1TokenBridge } from "src/L1TokenBridge.sol";
 import { GemMock } from "test/mocks/GemMock.sol";
 import { MessengerMock } from "test/mocks/MessengerMock.sol";
 import { L1TokenBridgeV2Mock } from "test/mocks/L1TokenBridgeV2Mock.sol";

@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { UUPSUpgradeable, ERC1967Utils } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 interface TokenLike {
     function mint(address, uint256) external;
