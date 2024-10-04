@@ -111,9 +111,9 @@ library TokenBridgeInit {
             minGasLimit: cfg.minGasLimit
         });
 
-        dss.chainlog.setAddress(cfg.govRelayCLKey, address(l1GovRelay));
-        dss.chainlog.setAddress(cfg.escrowCLKey,   address(escrow));
-        dss.chainlog.setAddress(cfg.l1BridgeCLKey, address(l1Bridge));
-        dss.chainlog.setAddress(cfg.l1BridgeImpCLKey,  l1BridgeInstance.bridgeImp);
+        dss.chainlog.setAddress(cfg.govRelayCLKey,    address(l1GovRelay));
+        dss.chainlog.setAddress(cfg.escrowCLKey,      address(escrow));
+        dss.chainlog.setAddress(cfg.l1BridgeCLKey,    address(l1Bridge));
+        dss.chainlog.setAddress(cfg.l1BridgeImpCLKey, l1BridgeInstance.bridgeImp);
     }
 }
