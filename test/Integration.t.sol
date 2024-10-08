@@ -28,7 +28,10 @@ import { L2TokenBridgeInstance } from "deploy/L2TokenBridgeInstance.sol";
 import { TokenBridgeInit, BridgesConfig } from "deploy/TokenBridgeInit.sol";
 import { L1TokenBridge } from "src/L1TokenBridge.sol";
 import { L2TokenBridge } from "src/L2TokenBridge.sol";
+import { L1GovernanceRelay } from "src/L1GovernanceRelay.sol";
 import { GemMock } from "test/mocks/GemMock.sol";
+import { L1TokenBridgeV2Mock } from "test/mocks/L1TokenBridgeV2Mock.sol";
+import { L2TokenBridgeV2Mock } from "test/mocks/L2TokenBridgeV2Mock.sol";
 
 interface SuperChainConfigLike {
     function guardian() external returns (address);
@@ -59,6 +62,7 @@ contract IntegrationTest is DssTest {
     address l2GovRelay;
     GemMock l2Token;
     L2TokenBridge l2Bridge;
+    address l2Spell;
     address L2_MESSENGER;
 
     constructor() {
@@ -81,8 +85,8 @@ contract IntegrationTest is DssTest {
         vm.label(L1_MESSENGER, "L1_MESSENGER");
         vm.label(L2_MESSENGER, "L2_MESSENGER");
 
-        address l1GovRelay_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 3); // foundry increments a global nonce across domains
-        address l1Bridge_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 5);
+        address l1GovRelay_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 4); // foundry increments a global nonce across domains
+        address l1Bridge_ = vm.computeCreateAddress(address(this), vm.getNonce(address(this)) + 7);
         l2Domain.selectFork();
         L2TokenBridgeInstance memory l2BridgeInstance = TokenBridgeDeploy.deployL2({
             deployer:    address(this),
@@ -92,7 +96,10 @@ contract IntegrationTest is DssTest {
         });
         l2GovRelay = l2BridgeInstance.govRelay;
         l2Bridge = L2TokenBridge(l2BridgeInstance.bridge);
-        assertEq(address(L2TokenBridgeSpell(l2BridgeInstance.spell).l2Bridge()), address(l2Bridge));
+        l2Spell = l2BridgeInstance.spell;
+        assertEq(address(L2TokenBridgeSpell(l2Spell).l2Bridge()), address(l2Bridge));
+        assertEq(l2Bridge.version(), "1");
+        assertEq(l2Bridge.getImplementation(), l2BridgeInstance.bridgeImp);
 
         l1Domain.selectFork();
         L1TokenBridgeInstance memory l1BridgeInstance = TokenBridgeDeploy.deployL1({
@@ -107,6 +114,8 @@ contract IntegrationTest is DssTest {
         l1Bridge = L1TokenBridge(l1BridgeInstance.bridge);
         assertEq(l1GovRelay, l1GovRelay_);
         assertEq(address(l1Bridge), l1Bridge_);
+        assertEq(l1Bridge.version(), "1");
+        assertEq(l1Bridge.getImplementation(), l1BridgeInstance.bridgeImp);
 
         l1Token = new GemMock(100 ether);
         vm.label(address(l1Token), "l1Token");
@@ -124,15 +133,16 @@ contract IntegrationTest is DssTest {
         uint256[] memory maxWithdraws = new uint256[](1);
         maxWithdraws[0] = 10_000_000 ether;
         BridgesConfig memory cfg = BridgesConfig({
-            l1Messenger:   L1_MESSENGER,
-            l2Messenger:   L2_MESSENGER,
-            l1Tokens:      l1Tokens,
-            l2Tokens:      l2Tokens,
-            maxWithdraws:  maxWithdraws,
-            minGasLimit:   1_000_000,
-            govRelayCLKey: "BASE_GOV_RELAY",
-            escrowCLKey:   "BASE_ESCROW",
-            l1BridgeCLKey: "BASE_TOKEN_BRIDGE"
+            l1Messenger:      L1_MESSENGER,
+            l2Messenger:      L2_MESSENGER,
+            l1Tokens:         l1Tokens,
+            l2Tokens:         l2Tokens,
+            maxWithdraws:     maxWithdraws,
+            minGasLimit:      1_000_000,
+            govRelayCLKey:    "BASE_GOV_RELAY",
+            escrowCLKey:      "BASE_ESCROW",
+            l1BridgeCLKey:    "BASE_TOKEN_BRIDGE",
+            l1BridgeImpCLKey: "BASE_TOKEN_BRIDGE_IMP"
         });
 
         l1Domain.selectFork();
@@ -146,6 +156,7 @@ contract IntegrationTest is DssTest {
         assertEq(dss.chainlog.getAddress("BASE_GOV_RELAY"),    l1GovRelay);
         assertEq(dss.chainlog.getAddress("BASE_ESCROW"),       escrow);
         assertEq(dss.chainlog.getAddress("BASE_TOKEN_BRIDGE"), l1Bridge_);
+        assertEq(dss.chainlog.getAddress("BASE_TOKEN_BRIDGE_IMP"), l1BridgeInstance.bridgeImp);
 
         l2Domain.relayFromHost(true);
 
@@ -224,5 +235,37 @@ contract IntegrationTest is DssTest {
 
         vm.expectRevert("CrossDomainMessenger: paused");
         l2Domain.relayToHost(true);
+    }
+
+    function testUpgrade() public {
+        l2Domain.selectFork();
+        address newL2Imp = address(new L2TokenBridgeV2Mock());
+        l1Domain.selectFork();
+        address newL1Imp = address(new L1TokenBridgeV2Mock());
+
+        vm.startPrank(PAUSE_PROXY);
+        l1Bridge.upgradeToAndCall(newL1Imp, abi.encodeCall(L1TokenBridgeV2Mock.reinitialize, ()));
+        vm.stopPrank();
+
+        assertEq(l1Bridge.getImplementation(), newL1Imp);
+        assertEq(l1Bridge.version(), "2");
+        assertEq(l1Bridge.wards(PAUSE_PROXY), 1); // still a ward
+
+        vm.startPrank(PAUSE_PROXY);
+        L1GovernanceRelay(l1GovRelay).relay({
+            target:     l2Spell,
+            targetData: abi.encodeCall(L2TokenBridgeSpell.upgradeToAndCall, (
+                newL2Imp,
+                abi.encodeCall(L2TokenBridgeV2Mock.reinitialize, ())
+            )),
+            minGasLimit: 100_000
+        });
+        vm.stopPrank();
+
+        l2Domain.relayFromHost(true);
+
+        assertEq(l2Bridge.getImplementation(), newL2Imp);
+        assertEq(l2Bridge.version(), "2");
+        assertEq(l2Bridge.wards(l2GovRelay), 1); // still a ward
     }
 }

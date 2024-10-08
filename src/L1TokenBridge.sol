@@ -17,6 +17,8 @@
 
 pragma solidity ^0.8.21;
 
+import { UUPSUpgradeable, ERC1967Utils } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 interface TokenLike {
     function transferFrom(address, address, uint256) external;
 }
@@ -26,18 +28,19 @@ interface CrossDomainMessengerLike {
     function sendMessage(address _target, bytes calldata _message, uint32 _minGasLimit) external payable;
 }
 
-contract L1TokenBridge {
+contract L1TokenBridge is UUPSUpgradeable {
     // --- storage variables ---
 
     mapping(address => uint256) public wards;
     mapping(address => address) public l1ToL2Token;
-    uint256 public isOpen = 1;
+    uint256 public isOpen;
     address public escrow;
 
-    // --- immutables ---
+    // --- immutables and const ---
 
     address public immutable otherBridge;
     CrossDomainMessengerLike public immutable messenger;
+    string public constant version = "1";
 
     // --- events ---
 
@@ -84,11 +87,26 @@ contract L1TokenBridge {
         address _otherBridge,
         address _messenger
     ) {
+        _disableInitializers(); // Avoid initializing in the context of the implementation
+
         otherBridge = _otherBridge;
         messenger = CrossDomainMessengerLike(_messenger);
+    }
 
+    // --- upgradability ---
+
+    function initialize() initializer external {
+        __UUPSUpgradeable_init();
+
+        isOpen = 1;
         wards[msg.sender] = 1;
         emit Rely(msg.sender);
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal override auth {}
+
+    function getImplementation() external view returns (address) {
+        return ERC1967Utils.getImplementation();
     }
 
     // --- administration ---

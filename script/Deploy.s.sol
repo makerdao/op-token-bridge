@@ -49,7 +49,7 @@ contract Deploy is Script {
 
         l2Domain.selectFork();
         address l2GovRelay = vm.computeCreateAddress(l2Deployer, vm.getNonce(l2Deployer));
-        address l2Bridge = vm.computeCreateAddress(l2Deployer, vm.getNonce(l2Deployer) + 1);
+        address l2Bridge = vm.computeCreateAddress(l2Deployer, vm.getNonce(l2Deployer) + 2);
 
         // Deploy chainlog, L1 gov relay, escrow and L1 bridge
 
@@ -130,7 +130,9 @@ contract Deploy is Script {
         ScriptTools.exportContract("deployed", "l1GovRelay", l1GovRelay);
         ScriptTools.exportContract("deployed", "l2GovRelay", l2GovRelay);
         ScriptTools.exportContract("deployed", "l1Bridge", l1Bridge);
+        ScriptTools.exportContract("deployed", "l1BridgeImp", l1BridgeInstance.bridgeImp);
         ScriptTools.exportContract("deployed", "l2Bridge", l2Bridge);
+        ScriptTools.exportContract("deployed", "l2BridgeImp", l2BridgeInstance.bridgeImp);
         ScriptTools.exportContract("deployed", "l2BridgeSpell", l2BridgeInstance.spell);
         ScriptTools.exportContracts("deployed", "l1Tokens", l1Tokens);
         ScriptTools.exportContracts("deployed", "l2Tokens", l2Tokens);

@@ -25,6 +25,9 @@ interface L2TokenBridgeLike {
     function isOpen() external view returns (uint256);
     function otherBridge() external view returns (address);
     function messenger() external view returns (address);
+    function version() external view returns (string memory);
+    function getImplementation() external view returns (address);
+    function upgradeToAndCall(address, bytes memory) external;
     function rely(address) external;
     function deny(address) external;
     function close() external;
@@ -44,6 +47,7 @@ contract L2TokenBridgeSpell {
         l2Bridge = L2TokenBridgeLike(l2Bridge_);
     }
 
+    function upgradeToAndCall(address newImp, bytes memory data) external { l2Bridge.upgradeToAndCall(newImp, data); }
     function rely(address usr) external { l2Bridge.rely(usr); }
     function deny(address usr) external { l2Bridge.deny(usr); }
     function close() external { l2Bridge.close(); }
@@ -66,6 +70,7 @@ contract L2TokenBridgeSpell {
     function init(
         address l2GovRelay_,
         address l2Bridge_,
+        address l2BridgeImp,
         address l1GovRelay,
         address l1Bridge,
         address l2Messenger,
@@ -77,6 +82,8 @@ contract L2TokenBridgeSpell {
 
         // sanity checks
         require(address(l2Bridge) == l2Bridge_, "L2TokenBridgeSpell/l2-bridge-mismatch");
+        require(keccak256(bytes(l2Bridge.version())) == keccak256("1"), "L2TokenBridgeSpell/version-does-not-match");
+        require(l2Bridge.getImplementation() == l2BridgeImp, "L2TokenBridgeSpell/imp-does-not-match");
         require(l2Bridge.isOpen() == 1, "L2TokenBridgeSpell/not-open");
         require(l2Bridge.otherBridge() == l1Bridge, "L2TokenBridgeSpell/other-bridge-mismatch");
         require(l2Bridge.messenger() == l2Messenger, "L2TokenBridgeSpell/l2-bridge-messenger-mismatch");

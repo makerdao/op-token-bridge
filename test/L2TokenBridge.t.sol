@@ -18,10 +18,13 @@
 pragma solidity ^0.8.21;
 
 import "dss-test/DssTest.sol";
-
+import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { Upgrades, Options } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { L2TokenBridge } from "src/L2TokenBridge.sol";
 import { GemMock } from "test/mocks/GemMock.sol";
 import { MessengerMock } from "test/mocks/MessengerMock.sol";
+import { L2TokenBridgeV2Mock } from "test/mocks/L2TokenBridgeV2Mock.sol";
 
 contract L2TokenBridgeTest is DssTest {
 
@@ -51,6 +54,7 @@ contract L2TokenBridgeTest is DssTest {
         uint256 messageNonce,
         uint256 gasLimit
     );
+    event UpgradedTo(string version);
 
     GemMock l2Token;
     address l1Token = address(0x111);
@@ -58,27 +62,32 @@ contract L2TokenBridgeTest is DssTest {
     address otherBridge = address(0xccc);
     address l2Router = address(0xbbb);
     MessengerMock messenger;
+    bool validate;
 
     function setUp() public {
+        validate = vm.envOr("VALIDATE", false);
+
         messenger = new MessengerMock();
         messenger.setXDomainMessageSender(otherBridge);
-        bridge = new L2TokenBridge(otherBridge, address(messenger));
+
+        L2TokenBridge imp = new L2TokenBridge(otherBridge, address(messenger));
+        assertEq(imp.otherBridge(), otherBridge);
+        assertEq(address(imp.messenger()), address(messenger));
+
+        vm.expectEmit(true, true, true, true);
+        emit Rely(address(this));
+        bridge = L2TokenBridge(address(new ERC1967Proxy(address(imp), abi.encodeCall(L2TokenBridge.initialize, ()))));
+        assertEq(bridge.getImplementation(), address(imp));
+        assertEq(bridge.wards(address(this)), 1);
+        assertEq(bridge.isOpen(), 1);
+        assertEq(bridge.otherBridge(), otherBridge);
+        assertEq(address(bridge.messenger()), address(messenger));
+
         l2Token = new GemMock(1_000_000 ether);
         l2Token.transfer(address(0xe0a), 500_000 ether);
         l2Token.rely(address(bridge));
         bridge.registerToken(l1Token, address(l2Token));
         bridge.setMaxWithdraw(address(l2Token), 1_000_000 ether);
-    }
-
-    function testConstructor() public {
-        vm.expectEmit(true, true, true, true);
-        emit Rely(address(this));
-        L2TokenBridge b = new L2TokenBridge(address(111), address(222));
-
-        assertEq(b.isOpen(), 1);
-        assertEq(b.otherBridge(), address(111));
-        assertEq(address(b.messenger()), address(222));
-        assertEq(b.wards(address(this)), 1);
     }
 
     function testAuth() public {
@@ -91,7 +100,8 @@ contract L2TokenBridgeTest is DssTest {
         checkModifier(address(bridge), string(abi.encodePacked("L2TokenBridge", "/not-authorized")), [
             bridge.close.selector,
             bridge.registerToken.selector,
-            bridge.setMaxWithdraw.selector
+            bridge.setMaxWithdraw.selector,
+            bridge.upgradeToAndCall.selector
         ]);
     }
 
@@ -205,5 +215,73 @@ contract L2TokenBridgeTest is DssTest {
 
         assertEq(l2Token.balanceOf(address(0xced)), balanceBefore + 100 ether);
         assertEq(l2Token.totalSupply(), supplyBefore + 100 ether);
+    }
+
+    function testDeployWithUpgradesLib() public {
+        Options memory opts;
+        if (!validate) {
+            opts.unsafeSkipAllChecks = true;
+        } else {
+            opts.unsafeAllow = 'state-variable-immutable,constructor';
+        }
+        opts.constructorData = abi.encode(otherBridge, address(messenger));
+
+        vm.expectEmit(true, true, true, true);
+        emit Rely(address(this));
+        address proxy = Upgrades.deployUUPSProxy(
+            "out/L2TokenBridge.sol/L2TokenBridge.json",
+            abi.encodeCall(L2TokenBridge.initialize, ()),
+            opts
+        );
+        assertEq(L2TokenBridge(proxy).version(), "1");
+        assertEq(L2TokenBridge(proxy).wards(address(this)), 1);
+    }
+
+    function testUpgrade() public {
+        address newImpl = address(new L2TokenBridgeV2Mock());
+        vm.expectEmit(true, true, true, true);
+        emit UpgradedTo("2");
+        bridge.upgradeToAndCall(newImpl, abi.encodeCall(L2TokenBridgeV2Mock.reinitialize, ()));
+
+        assertEq(bridge.getImplementation(), newImpl);
+        assertEq(bridge.version(), "2");
+        assertEq(bridge.wards(address(this)), 1); // still a ward
+    }
+
+    function testUpgradeWithUpgradesLib() public {
+        address implementation1 = bridge.getImplementation();
+
+        Options memory opts;
+        if (!validate) {
+            opts.unsafeSkipAllChecks = true;
+        } else {
+            opts.referenceContract = "out/L2TokenBridge.sol/L2TokenBridge.json";
+            opts.unsafeAllow = 'constructor';
+        }
+
+        vm.expectEmit(true, true, true, true);
+        emit UpgradedTo("2");
+        Upgrades.upgradeProxy(
+            address(bridge),
+            "out/L2TokenBridgeV2Mock.sol/L2TokenBridgeV2Mock.json",
+            abi.encodeCall(L2TokenBridgeV2Mock.reinitialize, ()),
+            opts
+        );
+
+        address implementation2 = bridge.getImplementation();
+        assertTrue(implementation1 != implementation2);
+        assertEq(bridge.version(), "2");
+        assertEq(bridge.wards(address(this)), 1); // still a ward
+    }
+
+    function testInitializeAgain() public {
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        bridge.initialize();
+    }
+
+    function testInitializeDirectly() public {
+        address implementation = bridge.getImplementation();
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        L2TokenBridge(implementation).initialize();
     }
 }
