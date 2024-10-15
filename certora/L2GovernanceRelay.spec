@@ -10,18 +10,30 @@ methods {
     function l2messenger.xDomainMessageSender() external returns (address) envfree;
 }
 
+definition addrZero() returns address = 0x0000000000000000000000000000000000000000;
+
+persistent ghost bool called;
+persistent ghost address calledAddr;
+persistent ghost uint256 dataLength;
 persistent ghost bool success;
 hook DELEGATECALL(uint256 g, address addr, uint256 argsOffset, uint256 argsLength, uint256 retOffset, uint256 retLength) uint256 rc {
+    called = true;
+    calledAddr = addr;
+    dataLength = argsLength;
     success = rc != 0;
 }
 
-// // Verify correct storage changes for non reverting relay
-// rule relay(address target, bytes targetData) {
-//     env e;
+// Verify correct storage changes for non reverting relay
+rule relay(address target, bytes targetData) {
+    env e;
 
-//     relay(e, target, targetData);
+    relay(e, target, targetData);
 
-// }
+    assert called, "Assert 1";
+    assert calledAddr == target, "Assert 2";
+    assert dataLength == targetData.length, "Assert 3";
+    assert success, "Assert 4";
+}
 
 // Verify revert rules on relay
 rule relay_revert(address target, bytes targetData) {
