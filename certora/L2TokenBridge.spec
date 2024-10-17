@@ -1,5 +1,6 @@
 // L2TokenBridge.spec
 
+using Auxiliar as aux;
 using MessengerMock as l2messenger;
 using GemMock as gem;
 
@@ -17,8 +18,8 @@ methods {
     function gem.allowance(address,address) external returns (uint256) envfree;
     function gem.totalSupply() external returns (uint256) envfree;
     function gem.balanceOf(address) external returns (uint256) envfree;
+    function aux.getBridgeMessageHash(address,address,address,address,uint256,bytes) external returns (bytes32) envfree;
     function l2messenger.xDomainMessageSender() external returns (address) envfree;
-    function l2messenger.getBridgeMessageHash(address,address,address,address,uint256,bytes) external returns (bytes32) envfree;
     function l2messenger.lastTarget() external returns (address) envfree;
     function l2messenger.lastMessageHash() external returns (bytes32) envfree;
     function l2messenger.lastMinGasLimit() external returns (uint32) envfree;
@@ -201,7 +202,7 @@ rule bridgeERC20(address _localToken, address _remoteToken, uint256 _amount, uin
 
     address otherBridge = otherBridge();
 
-    bytes32 message = l2messenger.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, e.msg.sender, _amount, _extraData);
+    bytes32 message = aux.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, e.msg.sender, _amount, _extraData);
     uint256 localTokenTotalSupplyBefore = gem.totalSupply();
     uint256 localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
     // ERC20 assumption
@@ -258,7 +259,7 @@ rule bridgeERC20To(address _localToken, address _remoteToken, address _to, uint2
 
     address otherBridge = otherBridge();
 
-    bytes32 message = l2messenger.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, _to, _amount, _extraData);
+    bytes32 message = aux.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, _to, _amount, _extraData);
     uint256 localTokenTotalSupplyBefore = gem.totalSupply();
     uint256 localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
     // ERC20 assumption

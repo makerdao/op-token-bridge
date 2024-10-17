@@ -10,12 +10,7 @@ interface BridgeLike {
     function finalizeBridgeERC20(address, address, address, address, uint256, bytes calldata) external;
 }
 
-contract MessengerMock {
-    address public xDomainMessageSender;
-    address public lastTarget;
-    bytes32 public lastMessageHash;
-    uint32  public lastMinGasLimit;
-
+contract Auxiliar {
     function getGovMessageHash(address target, bytes calldata targetData) public pure returns (bytes32) {
         return keccak256(abi.encodeCall(GovernanceRelayLike.relay, (target, targetData)));
     }
@@ -30,11 +25,4 @@ contract MessengerMock {
             extraData
         )));
     }
-
-    function sendMessage(address target, bytes calldata message, uint32 minGasLimit) public {
-        lastTarget = target;
-        lastMessageHash = keccak256(message);
-        lastMinGasLimit = minGasLimit;
-    }
-
 }

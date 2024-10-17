@@ -1,5 +1,6 @@
 // L1GovernanceRelay.spec
 
+using Auxiliar as aux;
 using MessengerMock as l1messenger;
 
 methods {
@@ -9,7 +10,7 @@ methods {
     function l2GovernanceRelay() external returns (address) envfree;
     function messenger() external returns (address) envfree;
     //
-    function l1messenger.getGovMessageHash(address,bytes) external returns (bytes32) envfree;
+    function aux.getGovMessageHash(address,bytes) external returns (bytes32) envfree;
     function l1messenger.lastTarget() external returns (address) envfree;
     function l1messenger.lastMessageHash() external returns (bytes32) envfree;
     function l1messenger.lastMinGasLimit() external returns (uint32) envfree;
@@ -103,7 +104,7 @@ rule relay(address target, bytes targetData, uint32 minGasLimit) {
 
     address l2GovernanceRelay = l2GovernanceRelay();
 
-    bytes32 message = l1messenger.getGovMessageHash(target, targetData);
+    bytes32 message = aux.getGovMessageHash(target, targetData);
 
     relay(e, target, targetData, minGasLimit);
 
