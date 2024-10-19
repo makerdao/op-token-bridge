@@ -125,7 +125,7 @@ rule close() {
 
     close(e);
 
-    uint256 isOpenAfter = isOpen();
+    mathint isOpenAfter = isOpen();
 
     assert isOpenAfter == 0, "Assert 1";
 }
@@ -203,8 +203,8 @@ rule bridgeERC20(address _localToken, address _remoteToken, uint256 _amount, uin
     address otherBridge = otherBridge();
 
     bytes32 message = aux.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, e.msg.sender, _amount, _extraData);
-    uint256 localTokenTotalSupplyBefore = gem.totalSupply();
-    uint256 localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
+    mathint localTokenTotalSupplyBefore = gem.totalSupply();
+    mathint localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
     // ERC20 assumption
     require localTokenTotalSupplyBefore >= localTokenBalanceOfSenderBefore;
 
@@ -213,8 +213,8 @@ rule bridgeERC20(address _localToken, address _remoteToken, uint256 _amount, uin
     address lastTargetAfter = l2messenger.lastTarget();
     bytes32 lastMessageHashAfter = l2messenger.lastMessageHash();
     uint32  lastMinGasLimitAfter = l2messenger.lastMinGasLimit();
-    uint256 localTokenTotalSupplyAfter = gem.totalSupply();
-    uint256 localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
+    mathint localTokenTotalSupplyAfter = gem.totalSupply();
+    mathint localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
 
     assert lastTargetAfter == otherBridge, "Assert 1";
     assert lastMessageHashAfter == message, "Assert 2";
@@ -231,8 +231,8 @@ rule bridgeERC20_revert(address _localToken, address _remoteToken, uint256 _amou
     address l1ToL2TokenRemoteToken = l1ToL2Token(_remoteToken);
     mathint maxWithdrawsLocatOken = maxWithdraws(_localToken);
 
-    uint256 localTokenTotalSupply = gem.totalSupply();
-    uint256 localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
+    mathint localTokenTotalSupply = gem.totalSupply();
+    mathint localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
     // ERC20 assumption
     require localTokenTotalSupply >= localTokenBalanceOfSender;
     // User assumptions
@@ -260,8 +260,8 @@ rule bridgeERC20To(address _localToken, address _remoteToken, address _to, uint2
     address otherBridge = otherBridge();
 
     bytes32 message = aux.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, _to, _amount, _extraData);
-    uint256 localTokenTotalSupplyBefore = gem.totalSupply();
-    uint256 localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
+    mathint localTokenTotalSupplyBefore = gem.totalSupply();
+    mathint localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
     // ERC20 assumption
     require localTokenTotalSupplyBefore >= localTokenBalanceOfSenderBefore;
 
@@ -270,8 +270,8 @@ rule bridgeERC20To(address _localToken, address _remoteToken, address _to, uint2
     address lastTargetAfter = l2messenger.lastTarget();
     bytes32 lastMessageHashAfter = l2messenger.lastMessageHash();
     uint32  lastMinGasLimitAfter = l2messenger.lastMinGasLimit();
-    uint256 localTokenTotalSupplyAfter = gem.totalSupply();
-    uint256 localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
+    mathint localTokenTotalSupplyAfter = gem.totalSupply();
+    mathint localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
 
     assert lastTargetAfter == otherBridge, "Assert 1";
     assert lastMessageHashAfter == message, "Assert 2";
@@ -288,8 +288,8 @@ rule bridgeERC20To_revert(address _localToken, address _remoteToken, address _to
     address l1ToL2TokenRemoteToken = l1ToL2Token(_remoteToken);
     mathint maxWithdrawsLocatOken = maxWithdraws(_localToken);
 
-    uint256 localTokenTotalSupply = gem.totalSupply();
-    uint256 localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
+    mathint localTokenTotalSupply = gem.totalSupply();
+    mathint localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
     // ERC20 assumption
     require localTokenTotalSupply >= localTokenBalanceOfSender;
     // User assumptions
@@ -313,15 +313,15 @@ rule finalizeBridgeERC20(address _localToken, address _remoteToken, address _fro
 
     require _localToken == gem;
 
-    uint256 localTokenTotalSupplyBefore = gem.totalSupply();
-    uint256 localTokenBalanceOfToBefore = gem.balanceOf(_to);
+    mathint localTokenTotalSupplyBefore = gem.totalSupply();
+    mathint localTokenBalanceOfToBefore = gem.balanceOf(_to);
     // ERC20 assumption
     require localTokenTotalSupplyBefore >= localTokenBalanceOfToBefore;
 
     finalizeBridgeERC20(e, _localToken, _remoteToken, _from, _to, _amount, _extraData);
 
-    uint256 localTokenTotalSupplyAfter = gem.totalSupply();
-    uint256 localTokenBalanceOfToAfter = gem.balanceOf(_to);
+    mathint localTokenTotalSupplyAfter = gem.totalSupply();
+    mathint localTokenBalanceOfToAfter = gem.balanceOf(_to);
 
     assert localTokenTotalSupplyAfter == localTokenTotalSupplyBefore + _amount, "Assert 1";
     assert localTokenBalanceOfToAfter == localTokenBalanceOfToBefore + _amount, "Assert 2";
@@ -337,8 +337,8 @@ rule finalizeBridgeERC20_revert(address _localToken, address _remoteToken, addre
     address otherBridge = otherBridge();
     address xDomainMessageSender = l2messenger.xDomainMessageSender();
 
-    uint256 localTokenTotalSupply = gem.totalSupply();
-    uint256 localTokenBalanceOfTo = gem.balanceOf(_to);
+    mathint localTokenTotalSupply = gem.totalSupply();
+    mathint localTokenBalanceOfTo = gem.balanceOf(_to);
     // ERC20 assumption
     require localTokenTotalSupply >= localTokenBalanceOfTo;
     // Practical assumption

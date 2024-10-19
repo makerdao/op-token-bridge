@@ -149,7 +149,7 @@ rule close() {
 
     close(e);
 
-    uint256 isOpenAfter = isOpen();
+    mathint isOpenAfter = isOpen();
 
     assert isOpenAfter == 0, "Assert 1";
 }
@@ -204,8 +204,8 @@ rule bridgeERC20(address _localToken, address _remoteToken, uint256 _amount, uin
     require e.msg.sender != escrow;
 
     bytes32 message = aux.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, e.msg.sender, _amount, _extraData);
-    uint256 localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
-    uint256 localTokenBalanceOfEscrowBefore = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
+    mathint localTokenBalanceOfEscrowBefore = gem.balanceOf(escrow);
     // ERC20 assumption
     require gem.totalSupply >= localTokenBalanceOfSenderBefore + localTokenBalanceOfEscrowBefore;
 
@@ -214,8 +214,8 @@ rule bridgeERC20(address _localToken, address _remoteToken, uint256 _amount, uin
     address lastTargetAfter = l1messenger.lastTarget();
     bytes32 lastMessageHashAfter = l1messenger.lastMessageHash();
     uint32  lastMinGasLimitAfter = l1messenger.lastMinGasLimit();
-    uint256 localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
-    uint256 localTokenBalanceOfEscrowAfter = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
+    mathint localTokenBalanceOfEscrowAfter = gem.balanceOf(escrow);
 
     assert lastTargetAfter == otherBridge, "Assert 1";
     assert lastMessageHashAfter == message, "Assert 2";
@@ -233,8 +233,8 @@ rule bridgeERC20_revert(address _localToken, address _remoteToken, uint256 _amou
 
     address escrow = escrow();
 
-    uint256 localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
-    uint256 localTokenBalanceOfEscrow = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
+    mathint localTokenBalanceOfEscrow = gem.balanceOf(escrow);
 
     // ERC20 assumption
     require gem.totalSupply() >= localTokenBalanceOfSender + localTokenBalanceOfEscrow;
@@ -264,8 +264,8 @@ rule bridgeERC20To(address _localToken, address _remoteToken, address _to, uint2
     require e.msg.sender != escrow;
 
     bytes32 message = aux.getBridgeMessageHash(_localToken, _remoteToken, e.msg.sender, _to, _amount, _extraData);
-    uint256 localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
-    uint256 localTokenBalanceOfEscrowBefore = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfSenderBefore = gem.balanceOf(e.msg.sender);
+    mathint localTokenBalanceOfEscrowBefore = gem.balanceOf(escrow);
     // ERC20 assumption
     require gem.totalSupply >= localTokenBalanceOfSenderBefore + localTokenBalanceOfEscrowBefore;
 
@@ -274,8 +274,8 @@ rule bridgeERC20To(address _localToken, address _remoteToken, address _to, uint2
     address lastTargetAfter = l1messenger.lastTarget();
     bytes32 lastMessageHashAfter = l1messenger.lastMessageHash();
     uint32  lastMinGasLimitAfter = l1messenger.lastMinGasLimit();
-    uint256 localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
-    uint256 localTokenBalanceOfEscrowAfter = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfSenderAfter = gem.balanceOf(e.msg.sender);
+    mathint localTokenBalanceOfEscrowAfter = gem.balanceOf(escrow);
 
     assert lastTargetAfter == otherBridge, "Assert 1";
     assert lastMessageHashAfter == message, "Assert 2";
@@ -293,8 +293,8 @@ rule bridgeERC20To_revert(address _localToken, address _remoteToken, address _to
 
     address escrow = escrow();
 
-    uint256 localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
-    uint256 localTokenBalanceOfEscrow = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfSender = gem.balanceOf(e.msg.sender);
+    mathint localTokenBalanceOfEscrow = gem.balanceOf(escrow);
 
     // ERC20 assumption
     require gem.totalSupply() >= localTokenBalanceOfSender + localTokenBalanceOfEscrow;
@@ -319,16 +319,16 @@ rule finalizeBridgeERC20(address _localToken, address _remoteToken, address _fro
 
     address escrow = escrow();
 
-    uint256 localTokenBalanceOfEscrowBefore = gem.balanceOf(escrow);
-    uint256 localTokenBalanceOfToBefore = gem.balanceOf(_to);
+    mathint localTokenBalanceOfEscrowBefore = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfToBefore = gem.balanceOf(_to);
 
     // ERC20 assumption
     require gem.totalSupply() >= localTokenBalanceOfEscrowBefore + localTokenBalanceOfToBefore;
 
     finalizeBridgeERC20(e, _localToken, _remoteToken, _from, _to, _amount, _extraData);
 
-    uint256 localTokenBalanceOfEscrowAfter = gem.balanceOf(escrow);
-    uint256 localTokenBalanceOfToAfter = gem.balanceOf(_to);
+    mathint localTokenBalanceOfEscrowAfter = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfToAfter = gem.balanceOf(_to);
 
     assert escrow != _to => localTokenBalanceOfEscrowAfter == localTokenBalanceOfEscrowBefore - _amount, "Assert 1";
     assert escrow != _to => localTokenBalanceOfToAfter == localTokenBalanceOfToBefore + _amount, "Assert 2";
@@ -346,7 +346,7 @@ rule finalizeBridgeERC20_revert(address _localToken, address _remoteToken, addre
     address xDomainMessageSender = l1messenger.xDomainMessageSender();
     address escrow = escrow();
 
-    uint256 localTokenBalanceOfEscrow = gem.balanceOf(escrow);
+    mathint localTokenBalanceOfEscrow = gem.balanceOf(escrow);
 
     // ERC20 assumption
     require gem.totalSupply() >= localTokenBalanceOfEscrow + gem.balanceOf(_to);

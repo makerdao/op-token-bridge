@@ -14,7 +14,7 @@ definition addrZero() returns address = 0x00000000000000000000000000000000000000
 
 persistent ghost bool called;
 persistent ghost address calledAddr;
-persistent ghost uint256 dataLength;
+persistent ghost mathint dataLength;
 persistent ghost bool success;
 hook DELEGATECALL(uint256 g, address addr, uint256 argsOffset, uint256 argsLength, uint256 retOffset, uint256 retLength) uint256 rc {
     called = true;
