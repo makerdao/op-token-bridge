@@ -10,8 +10,6 @@ methods {
     function l2messenger.xDomainMessageSender() external returns (address) envfree;
 }
 
-definition addrZero() returns address = 0x0000000000000000000000000000000000000000;
-
 persistent ghost bool called;
 persistent ghost address calledAddr;
 persistent ghost mathint dataLength;

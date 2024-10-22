@@ -26,8 +26,6 @@ methods {
     function _.transferFrom(address,address,uint256) external => DISPATCHER(true);
 }
 
-definition addrZero() returns address = 0x0000000000000000000000000000000000000000;
-
 // Verify that each storage layout is only modified in the corresponding functions
 rule storageAffected(method f) filtered { f -> f.selector != sig:upgradeToAndCall(address, bytes).selector } {
     env e;
@@ -247,7 +245,7 @@ rule bridgeERC20_revert(address _localToken, address _remoteToken, uint256 _amou
     bool revert1 = e.msg.value > 0;
     bool revert2 = nativeCodesize[e.msg.sender] != 0;
     bool revert3 = isOpen != 1;
-    bool revert4 = _remoteToken == addrZero() || l1ToL2TokenLocalToken != _remoteToken;
+    bool revert4 = _remoteToken == 0 || l1ToL2TokenLocalToken != _remoteToken;
 
     assert lastReverted <=> revert1 || revert2 || revert3 ||
                             revert4, "Revert rules failed";
@@ -306,7 +304,7 @@ rule bridgeERC20To_revert(address _localToken, address _remoteToken, address _to
 
     bool revert1 = e.msg.value > 0;
     bool revert2 = isOpen != 1;
-    bool revert3 = _remoteToken == addrZero() || l1ToL2TokenLocalToken != _remoteToken;
+    bool revert3 = _remoteToken == 0 || l1ToL2TokenLocalToken != _remoteToken;
 
     assert lastReverted <=> revert1 || revert2 || revert3, "Revert rules failed";
 }
