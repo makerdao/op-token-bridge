@@ -2,6 +2,6 @@
 
 pragma solidity ^0.8.21;
 
-contract ImplementatioNMock {
+contract ImplementationMock {
     bytes32 public proxiableUUID;
 }
