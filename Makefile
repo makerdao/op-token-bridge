@@ -1,4 +1,4 @@
-PATH := ~/.solc-select/artifacts/solc-0.8.21:$(PATH)
+PATH := ~/.solc-select/artifacts/:~/.solc-select/artifacts/solc-0.8.21:$(PATH)
 certora-escrow              :; PATH=${PATH} certoraRun certora/Escrow.conf$(if $(rule), --rule $(rule),)$(if $(results), --wait_for_results all,)
 certora-l1-governance-relay :; PATH=${PATH} certoraRun certora/L1GovernanceRelay.conf$(if $(rule), --rule $(rule),)$(if $(results), --wait_for_results all,)
 certora-l2-governance-relay :; PATH=${PATH} certoraRun certora/L2GovernanceRelay.conf$(if $(rule), --rule $(rule),)$(if $(results), --wait_for_results all,)
