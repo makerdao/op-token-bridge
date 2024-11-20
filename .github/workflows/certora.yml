@@ -1,0 +1,48 @@
+name: Certora
+
+on: [push, pull_request]
+
+jobs:
+  certora:
+    name: Certora
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        op-token-bridge:
+          - escrow
+          - l1-governance-relay
+          - l2-governance-relay
+          - l1-token-bridge
+          - l2-token-bridge
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+          java-package: jre
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+
+      - name: Install solc-select
+        run: pip3 install solc-select
+
+      - name: Solc Select 0.8.21
+        run: solc-select install 0.8.21
+
+      - name: Install Certora
+        run: pip3 install certora-cli-beta
+
+      - name: Verify ${{ matrix.op-token-bridge }}
+        run: make certora-${{ matrix.op-token-bridge }} results=1
+        env:
+          CERTORAKEY: ${{ secrets.CERTORAKEY }}
